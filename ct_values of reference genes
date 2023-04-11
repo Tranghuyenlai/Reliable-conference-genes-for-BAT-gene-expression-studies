@@ -1,0 +1,51 @@
+library(pcr)
+library(tidyverse)
+library(ggbreak)
+#differentiation
+ct <- read_csv('ct_value_ref_gene_on_dif.csv')
+
+graph <- ct%>%
+  mutate(gene = factor(gene, levels = c('Actb', 'B2m', 'Gapdh','Gusb',
+                                        'Hprt', 'Pgk1', 'Rer1', 'Rpl13a',
+                                        'Rps18', 'Tbp', 'Tubb5', 'Ubc', 'Sdha')))%>%
+  
+  group_by(gene,date)%>%
+  ggplot(aes(x = gene, y = ct_value,
+             fill = date)) +
+  geom_boxplot()+
+  labs(x = '', y = 'Ct values') +
+  theme(axis.text.x = element_text(hjust = 1, angle = 45),
+        panel.spacing = unit(1, 'mm'),
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 0))+
+  ylim(14, 31)
+
+graph
+ggsave(plot = graph,
+       filename = 'ct values of candidate genes on differentiations_fill.png',
+       width = 9, height = 6,dpi = 300)
+#Nore-induced thermogenesis
+ct <- read_csv('ct_value_ref_gene_on_Nore.csv')
+
+graph <- ct%>%
+  mutate(gene = factor(gene, levels = c('Actb', 'B2m', 'Gapdh','Gusb',
+                                        'Hprt', 'Pgk1', 'Rer1', 'Rpl13a',
+                                        'Rps18', 'Tbp', 'Tubb5', 'Ubc', 'Sdha')))%>%
+  
+  group_by(gene,date)%>%
+  ggplot(aes(x = gene, y = ct_value,
+             fill = date)) +
+  geom_boxplot()+
+  labs(x = '', y = 'Ct values') +
+  theme(axis.text.x = element_text(hjust = 1, angle = 45),
+        panel.spacing = unit(1, 'mm'),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 0),
+        panel.grid = element_blank())+
+  ylim(13, 30)
+
+graph
+ggsave(plot = graph,
+       filename = 'ct values of candidate genes on Nore-induced thermogenesis_fill.png',
+       width = 9, height = 6,dpi = 300)
