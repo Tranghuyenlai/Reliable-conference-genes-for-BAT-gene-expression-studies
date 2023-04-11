@@ -1,0 +1,201 @@
+library(tidyverse)
+
+###################
+#1. Gene stability in brown adipocyte differentiation
+
+stab <- read_csv('Gene_stability_in_brown_adipocyte_differentiation.csv')
+#comprehensive
+graph <- stab%>%
+  select(genes, comprehensive)%>%
+  mutate(genes = reorder(genes, comprehensive)) %>%
+  ggplot(aes(x=genes, y = comprehensive))+
+  geom_col(width = 0.7) +
+  geom_text(aes(label = round(comprehensive, 2)), 
+            position = position_dodge(width = 0.7), 
+            vjust = -0.5, size = 2) +
+  labs(x = '', y = 'Geomean of ranking values')+
+  theme(axis.text.x = element_text(hjust = 1,angle = 45),
+        panel.spacing = unit(1, 'mm'),
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 0))
+graph
+ggsave(plot = graph,
+       filename = 'Comprehensive gene stability (dif).png',
+       width = 3, height = 3,dpi = 300)
+#delta_ct
+graph <- stab%>%
+  select(genes, Delta_CT)%>%
+  mutate(genes = reorder(genes, Delta_CT)) %>%
+  ggplot(aes(x=genes, y = Delta_CT))+
+  geom_col(width = 0.7) +
+  geom_text(aes(label = round(Delta_CT, 2)), 
+            position = position_dodge(width = 0.7), 
+            vjust = -0.5, size = 2) +
+  labs(x = '', y = 'Gene expression (Ct)\n average of standard deviation')+
+  theme(axis.text.x = element_text(hjust = 1,angle = 45),
+        panel.spacing = unit(1, 'mm'),
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 0))
+graph
+ggsave(plot = graph,
+       filename = 'gene stability by Delta CT (dif).png',
+       width = 3, height = 3,dpi = 300)
+#BestKeeper
+graph <- stab%>%
+  select(genes, BestKeeper)%>%
+  mutate(genes = reorder(genes, BestKeeper)) %>%
+  ggplot(aes(x=genes, y = BestKeeper))+
+  geom_col(width = 0.7) +
+  geom_text(aes(label = round(BestKeeper, 2)), 
+            position = position_dodge(width = 0.7), 
+            vjust = -0.5, size = 2) +
+  labs(x = '', y = 'Ct standard deviation')+
+  theme(axis.text.x = element_text(hjust = 1, angle = 45),
+        panel.spacing = unit(1, 'mm'),
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 0))
+graph
+ggsave(plot = graph,
+       filename = 'gene stability by BestKeeper (dif).png',
+       width = 3, height = 3,dpi = 300)
+#normFinder
+graph <- stab%>%
+  select(genes, normFinder)%>%
+  mutate(genes = reorder(genes, normFinder)) %>%
+  ggplot(aes(x=genes, y = normFinder))+
+  geom_col(width = 0.7) +
+  geom_text(aes(label = round(normFinder, 2)), 
+            position = position_dodge(width = 0.7), 
+            vjust = -0.5, size = 2) +
+  labs(x = '', y = 'Expression stability')+
+  theme(axis.text.x = element_text(hjust = 1, angle = 45),
+        panel.spacing = unit(1, 'mm'),
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 0))
+graph
+ggsave(plot = graph,
+       filename = 'gene stability by normFinder (dif).png',
+       width = 3, height = 3,dpi = 300)
+#geNorm
+graph <- stab%>%
+  select(genes, Genorm)%>%
+  mutate(genes = reorder(genes, Genorm)) %>%
+  ggplot(aes(x=genes, y = Genorm))+
+  geom_col(width = 0.7) +
+  geom_text(aes(label = round(Genorm, 2)), 
+            position = position_dodge(width = 0.7), 
+            vjust = -0.5, size = 2) +
+  labs(x = '', y = 'Expression stability M')+
+  theme(axis.text.x = element_text(hjust = 1, angle = 45),
+        panel.spacing = unit(1, 'mm'),
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 0))
+graph
+ggsave(plot = graph,
+       filename = 'gene stability by geNorm (dif).png',
+       width = 3, height = 3,dpi = 300)
+
+###################
+#2. Gene stability in Norepinephrine treatment
+
+stab <- read_csv('gene_stability_in_Thermogenesis.csv')
+#comprehensive
+graph <- stab%>%
+  select(genes, comprehensive)%>%
+  mutate(genes = reorder(genes, comprehensive)) %>%
+  ggplot(aes(x=genes, y = comprehensive))+
+  geom_col(width = 0.7) +
+  geom_text(aes(label = round(comprehensive, 2)), 
+            position = position_dodge(width = 0.7), 
+            vjust = -0.5, size = 2) +
+  labs(x = '', y = 'Geomean of ranking values')+
+  theme(axis.text.x = element_text(hjust = 1,angle = 45),
+        panel.spacing = unit(1, 'mm'),
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 0))
+graph
+ggsave(plot = graph,
+       filename = 'Comprehensive gene stability (Nore).png',
+       width = 3, height = 3,dpi = 300)
+#delta_ct
+graph <- stab%>%
+  select(genes, Delta_CT)%>%
+  mutate(genes = reorder(genes, Delta_CT)) %>%
+  ggplot(aes(x=genes, y = Delta_CT))+
+  geom_col(width = 0.7) +
+  geom_text(aes(label = round(Delta_CT, 2)), 
+            position = position_dodge(width = 0.7), 
+            vjust = -0.5, size = 2) +
+  labs(x = '', y = 'Gene expression (Ct)\n average of standard deviation')+
+  theme(axis.text.x = element_text(hjust = 1,angle = 45),
+        panel.spacing = unit(1, 'mm'),
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 0))
+graph
+ggsave(plot = graph,
+       filename = 'gene stability by Delta CT (Nore).png',
+       width = 3, height = 3,dpi = 300)
+#BestKeeper
+graph <- stab%>%
+  select(genes, BestKeeper)%>%
+  mutate(genes = reorder(genes, BestKeeper)) %>%
+  ggplot(aes(x=genes, y = BestKeeper))+
+  geom_col(width = 0.7) +
+  geom_text(aes(label = round(BestKeeper, 2)), 
+            position = position_dodge(width = 0.7), 
+            vjust = -0.5, size = 2) +
+  labs(x = '', y = 'Ct standard deviation')+
+  theme(axis.text.x = element_text(hjust = 1, angle = 45),
+        panel.spacing = unit(1, 'mm'),
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 0))
+graph
+ggsave(plot = graph,
+       filename = 'gene stability by BestKeeper (Nore).png',
+       width = 3, height = 3,dpi = 300)
+#normFinder
+graph <- stab%>%
+  select(genes, normFinder)%>%
+  mutate(genes = reorder(genes, normFinder)) %>%
+  ggplot(aes(x=genes, y = normFinder))+
+  geom_col(width = 0.7) +
+  geom_text(aes(label = round(normFinder, 2)), 
+            position = position_dodge(width = 0.7), 
+            vjust = -0.5, size = 2) +
+  labs(x = '', y = 'Expression stability')+
+  theme(axis.text.x = element_text(hjust = 1, angle = 45),
+        panel.spacing = unit(1, 'mm'),
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 0))
+graph
+ggsave(plot = graph,
+       filename = 'gene stability by normFinder (Nore).png',
+       width = 3, height = 3,dpi = 300)
+#geNorm
+graph <- stab%>%
+  select(genes, Genorm)%>%
+  mutate(genes = reorder(genes, Genorm)) %>%
+  ggplot(aes(x=genes, y = Genorm))+
+  geom_col(width = 0.7) +
+  geom_text(aes(label = round(Genorm, 2)), 
+            position = position_dodge(width = 0.7), 
+            vjust = -0.5, size = 2) +
+  labs(x = '', y = 'Expression stability M')+
+  theme(axis.text.x = element_text(hjust = 1, angle = 45),
+        panel.spacing = unit(1, 'mm'),
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 0))
+graph
+ggsave(plot = graph,
+       filename = 'gene stability by geNorm (Nore).png',
+       width = 3, height = 3,dpi = 300)
