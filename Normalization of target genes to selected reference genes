@@ -1,0 +1,207 @@
+library(pcr)
+library(tidyverse)
+library(ggbreak)
+#1. samples on Nore treatments
+# Read 
+ct <- read.csv('normalize_to_Nore_wo.csv')
+
+# Specify reference genes for normalization
+reference_genes <- c("Tbp", "Ubc", "Rer1","Sdha")
+target_genes <- c("Ucp1", "PPARG")
+group_var <- ct$date
+
+# Initialize an empty data frame to store the results
+all_results <- data.frame()
+
+# Perform analysis for each reference gene and target gene
+for (ref_gene in reference_genes) {
+  for (target_gene in target_genes) {
+    # Select gene expression data for reference gene and target gene
+    ct_ref <- ct %>% select(all_of(ref_gene))
+    ct_target <- ct %>% select(all_of(target_gene))
+    ct_bind <- bind_cols(ct_ref, ct_target)
+    
+    # Add group variable to data
+    ct_bind <- ct_bind %>% mutate(date = group_var)
+    
+    group <- pull(ct, date)
+    group <- relevel(factor(group), ref = 'D0')
+    
+    # Perform PCR analysis and test
+    res <- pcr_analyze(ct_bind[-3], 
+                       group_var = group_var,
+                       reference_gene = ref_gene,
+                       reference_group = "D0")
+    
+    res_test <- map_df(levels(group)[-1], ~{
+      com <- c('D0', .x)
+      ct <- filter(ct_bind[-3], group %in% com)
+      g <- factor(group[group %in% com], levels = com)
+      
+      pcr_test(ct,
+               group_var = g,
+               reference_gene = ref_gene,
+               reference_group = 'D0') %>%
+        mutate(group = .x)
+    }) %>%
+      select(group, p_value)
+    
+    # Combine results into single data frame and append to all_results
+    res <- res %>%
+      left_join(res_test) %>%
+      mutate(ref_gene = ref_gene, target_gene = target_gene) %>%
+      mutate(sig = ifelse(p_value < .001, '****',
+                          ifelse(p_value < 0.005, '***',
+                                 ifelse(p_value < 0.01, '**',
+                                        ifelse(p_value < 0.05, '*', '')))))
+    
+    all_results <- rbind(all_results, res)
+  }
+}
+
+all_results
+#plotting UCP1 in Nore_treatment condition
+graph <- all_results %>%
+  filter(target_gene == 'Ucp1') %>%
+  mutate(ref_gene = factor(ref_gene, levels = c('Tbp', 'Ubc', 'Rer1','Sdha'))) %>%
+  ggplot(aes(x = group, y = relative_expression, 
+             fill = ref_gene, ymin = lower, ymax = upper)) +
+  geom_col(position = position_dodge(width = 0.7), width = 0.7) +
+  scale_y_break(c(5, 19000), scales = 2) +
+  scale_y_break(c(140000, 200000), scales = 2) +
+  geom_errorbar(position = position_dodge(width = 0.7), width = 0.3) +
+  labs(x = '', y = 'Relative UCP1 mRNA expression') +
+  theme(axis.text.x = element_text(hjust = 0.5),
+        panel.spacing = unit(1, 'mm'),
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 0))+
+  ylim(0,2000000)
+graph
+
+ggsave(plot = graph,
+       filename = 'mUCP1_on_Nore.png',
+       width = 7, height = 3.5,dpi = 300)
+#plotting PPARG in Nore_treatment condition
+graph <- all_results %>%
+  filter(target_gene == 'PPARG') %>%
+  mutate(ref_gene = factor(ref_gene, levels = c('Tbp', 'Ubc', 'Rer1','Sdha'))) %>%
+  ggplot(aes(x = group, y = relative_expression, 
+             fill = ref_gene, ymin = lower, ymax = upper)) +
+  geom_col(position = position_dodge(width = 0.7), width = 0.7) +
+  scale_y_break(c(3.5, 20), scales = 2) +
+  geom_errorbar(position = position_dodge(width = 0.7), width = 0.3) +
+  labs(x = '', y = 'Relative PPARG mRNA expression') +
+  theme(axis.text.x = element_text(hjust = 0.5),
+        panel.spacing = unit(1, 'mm'),
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 0))+
+  ylim(0,60)
+graph
+ggsave(plot = graph,
+       filename = 'mPPARG_on_Nore.png',
+       width = 7, height = 3.5,dpi = 300)
+
+################################################################################
+#2. samples on differentiation days
+# Read 
+ct <- read.csv('normalize_to_differentiation_days.csv')
+
+# Specify reference genes for normalization
+reference_genes <- c("Tbp", "Ubc", "Rer1","Sdha")
+target_genes <- c("Ucp1", "PPARG")
+group_var <- ct$date
+
+# Initialize an empty data frame to store the results
+all_results <- data.frame()
+
+# Perform analysis for each reference gene and target gene
+for (ref_gene in reference_genes) {
+  for (target_gene in target_genes) {
+    # Select gene expression data for reference gene and target gene
+    ct_ref <- ct %>% select(all_of(ref_gene))
+    ct_target <- ct %>% select(all_of(target_gene))
+    ct_bind <- bind_cols(ct_ref, ct_target)
+    
+    # Add group variable to data
+    ct_bind <- ct_bind %>% mutate(date = group_var)
+    
+    group <- pull(ct, date)
+    group <- relevel(factor(group), ref = 'D0')
+    
+    # Perform PCR analysis and test
+    res <- pcr_analyze(ct_bind[-3], 
+                       group_var = group_var,
+                       reference_gene = ref_gene,
+                       reference_group = "D0")
+    
+    res_test <- map_df(levels(group)[-1], ~{
+      com <- c('D0', .x)
+      ct <- filter(ct_bind[-3], group %in% com)
+      g <- factor(group[group %in% com], levels = com)
+      
+      pcr_test(ct,
+               group_var = g,
+               reference_gene = ref_gene,
+               reference_group = 'D0') %>%
+        mutate(group = .x)
+    }) %>%
+      select(group, p_value)
+    
+    # Combine results into single data frame and append to all_results
+    res <- res %>%
+      left_join(res_test) %>%
+      mutate(ref_gene = ref_gene, target_gene = target_gene) %>%
+      mutate(sig = ifelse(p_value < .001, '****',
+                          ifelse(p_value < 0.005, '***',
+                                 ifelse(p_value < 0.01, '**',
+                                        ifelse(p_value < 0.05, '*', '')))))
+    
+    all_results <- rbind(all_results, res)
+  }
+}
+
+all_results
+#plotting UCP1 in Nore_treatment condition
+graph <- all_results %>%
+  filter(target_gene == 'Ucp1') %>%
+  mutate(ref_gene = factor(ref_gene, levels = c('Tbp', 'Ubc', 'Rer1','Sdha'))) %>%
+  ggplot(aes(x = group, y = relative_expression, 
+             fill = ref_gene, ymin = lower, ymax = upper)) +
+  geom_col(position = position_dodge(width = 0.7), width = 0.7) +
+  scale_y_break(c(30, 290), scales = 2) +
+  scale_y_break(c(1000, 2000), scales = 2) +
+  scale_y_break(c(7000, 11000), scales = 2) +
+  geom_errorbar(position = position_dodge(width = 0.7), width = 0.3) +
+  labs(x = '', y = 'Relative UCP1 mRNA expression') +
+  theme(axis.text.x = element_text(hjust = 0.5),
+        panel.spacing = unit(1, 'mm'),
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 0))+
+  ylim(0,100000)
+graph
+
+ggsave(plot = graph,
+       filename = 'mUCP1_on_differentiation.png',
+       width = 7, height = 3.5,dpi = 300)
+#plotting PPARG in differentiation
+graph <- all_results %>%
+  filter(target_gene == 'PPARG') %>%
+  mutate(ref_gene = factor(ref_gene, levels = c('Tbp', 'Ubc', 'Rer1','Sdha'))) %>%
+  ggplot(aes(x = group, y = relative_expression, 
+             fill = ref_gene, ymin = lower, ymax = upper)) +
+  geom_col(position = position_dodge(width = 0.7), width = 0.7) +
+  geom_errorbar(position = position_dodge(width = 0.7), width = 0.3) +
+  labs(x = '', y = 'Relative PPARG mRNA expression') +
+  theme(axis.text.x = element_text(hjust = 0.5),
+        panel.spacing = unit(1, 'mm'),
+        panel.grid = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 0))+
+  ylim(0,50)
+graph
+ggsave(plot = graph,
+       filename = 'mPPARG_on_differentiation.png',
+       width = 6.5, height = 3.5,dpi = 300)
