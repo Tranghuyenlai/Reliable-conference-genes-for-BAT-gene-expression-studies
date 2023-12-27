@@ -1,51 +1,76 @@
 library(pcr)
 library(tidyverse)
 library(ggbreak)
-#differentiation
-ct <- read_csv('ct_value_ref_gene_on_dif.csv')
 
-graph <- ct%>%
-  mutate(gene = factor(gene, levels = c('Actb', 'B2m', 'Gapdh','Gusb',
-                                        'Hprt', 'Pgk1', 'Rer1', 'Rpl13a',
-                                        'Rps18', 'Tbp', 'Tubb5', 'Ubc', 'Sdha')))%>%
-  
-  group_by(gene,date)%>%
-  ggplot(aes(x = gene, y = ct_value,
-             fill = date)) +
-  geom_boxplot()+
+# Read data for differentiation
+ct_dif <- read_csv('ct_value_ref_gene_on_dif.csv')
+
+# Perform Shapiro-Wilk test for each gene's Ct values
+shapiro_results <- ct_dif %>%
+  group_by(gene) %>%
+  summarize(p_value = shapiro.test(ct_value)$p.value)
+
+# Print Shapiro-Wilk test results
+print(shapiro_results)
+
+# Plot differentiation graph
+graph_dif <- ct_dif %>%
+  mutate(gene = factor(gene, levels = c('Actb', 'B2m', 'Gapdh', 'Gusb', 'Hprt', 'Pgk1', 'Rer1', 'Rpl13a', 'Rps18', 'Tbp', 'Tubb5', 'Ubc', 'Sdha'))) %>%
+  group_by(gene, date) %>%
+  ggplot(aes(x = gene, y = ct_value, fill = date)) +
+  geom_boxplot() +
   labs(x = '', y = 'Ct values') +
-  theme(axis.text.x = element_text(hjust = 1, angle = 45),
-        panel.spacing = unit(1, 'mm'),
-        panel.grid = element_blank(),
-        strip.background = element_blank(),
-        axis.title.x = element_text(size = 0))+
+  theme(
+    axis.text.x = element_text(hjust = 1, angle = 45),
+    panel.spacing = unit(1, 'mm'),
+    panel.grid = element_blank(),
+    strip.background = element_blank(),
+    axis.title.x = element_text(size = 0)
+  ) +
   ylim(14, 31)
 
-graph
-ggsave(plot = graph,
-       filename = 'ct values of candidate genes on differentiations_fill.png',
-       width = 9, height = 6,dpi = 300)
-#Nore-induced thermogenesis
-ct <- read_csv('ct_value_ref_gene_on_Nore.csv')
+# Save differentiation plot
+ggsave(
+  plot = graph_dif,
+  filename = 'ct_values_differentiation_fill.png',
+  width = 9,
+  height = 6,
+  dpi = 300
+)
 
-graph <- ct%>%
-  mutate(gene = factor(gene, levels = c('Actb', 'B2m', 'Gapdh','Gusb',
-                                        'Hprt', 'Pgk1', 'Rer1', 'Rpl13a',
-                                        'Rps18', 'Tbp', 'Tubb5', 'Ubc', 'Sdha')))%>%
-  
-  group_by(gene,date)%>%
-  ggplot(aes(x = gene, y = ct_value,
-             fill = date)) +
-  geom_boxplot()+
+
+library(pcr)
+library(tidyverse)
+library(ggbreak)
+
+# Read data for Nore-induced thermogenesis
+ct_nore <- read_csv('ct_value_ref_gene_on_Nore.csv')
+
+# Perform Shapiro-Wilk test for each gene's Ct values
+shapiro_results_nore <- ct_nore %>%
+  group_by(gene) %>%
+  summarize(p_value = shapiro.test(ct_value)$p.value)
+
+# Print Shapiro-Wilk test results
+print(shapiro_results_nore)
+
+# Plot Nore-induced thermogenesis graph
+graph_nore <- ct_nore %>%
+  mutate(gene = factor(gene, levels = c('Actb', 'B2m', 'Gapdh', 'Gusb', 'Hprt', 'Pgk1', 'Rer1', 'Rpl13a', 'Rps18', 'Tbp', 'Tubb5', 'Ubc', 'Sdha'))) %>%
+  group_by(gene, date) %>%
+  ggplot(aes(x = gene, y = ct_value, fill = date)) +
+  geom_boxplot() +
   labs(x = '', y = 'Ct values') +
-  theme(axis.text.x = element_text(hjust = 1, angle = 45),
-        panel.spacing = unit(1, 'mm'),
-        strip.background = element_blank(),
-        axis.title.x = element_text(size = 0),
-        panel.grid = element_blank())+
+  theme(
+    axis.text.x = element_text(hjust = 1, angle = 45),
+    panel.spacing = unit(1, 'mm'),
+    strip.background = element_blank(),
+    axis.title.x = element_text(size = 0),
+    panel.grid = element_blank()
+  ) +
   ylim(13, 30)
 
-graph
-ggsave(plot = graph,
-       filename = 'ct values of candidate genes on Nore-induced thermogenesis_fill.png',
-       width = 9, height = 6,dpi = 300)
+# Save Nore-induced thermogenesis plot
+ggsave(
+  plot = graph_nore,
+  filename = 'ct_values_Nore-induce
